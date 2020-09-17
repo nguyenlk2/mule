@@ -35,6 +35,7 @@ import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrateg
 import static org.mule.runtime.core.api.source.MessageSource.BackPressureStrategy.WAIT;
 import static org.mule.runtime.core.api.transaction.TransactionCoordination.getInstance;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategy.TRANSACTIONAL_ERROR_MESSAGE;
+import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.FLOW;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractProcessingStrategyTestCase.Mode.SOURCE;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.CORES;
 import static org.mule.runtime.core.internal.processor.strategy.AbstractStreamProcessingStrategyFactory.DEFAULT_BUFFER_SIZE;
@@ -44,6 +45,7 @@ import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.P
 import static org.mule.test.allure.AllureConstants.ProcessingStrategiesFeature.ProcessingStrategiesStory.PROACTOR;
 import static reactor.util.concurrent.Queues.XS_BUFFER_SIZE;
 
+import org.junit.runner.RunWith;
 import org.mule.runtime.api.exception.DefaultMuleException;
 import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.exception.MuleRuntimeException;
@@ -58,6 +60,9 @@ import org.mule.runtime.core.internal.construct.FlowBackPressureRequiredSchedule
 import org.mule.runtime.core.internal.exception.MessagingException;
 import org.mule.runtime.core.internal.processor.strategy.ProactorStreamWorkQueueProcessingStrategyFactory.ProactorStreamWorkQueueProcessingStrategy;
 import org.mule.tck.TriggerableMessageSource;
+import org.mule.tck.junit4.FlakinessDetectorTestRunner;
+import org.mule.tck.junit4.FlakinessDetectorTestRunnerWithParameters;
+import org.mule.tck.junit4.FlakyTest;
 import org.mule.tck.testmodels.mule.TestTransaction;
 
 import java.util.ArrayList;
@@ -74,13 +79,15 @@ import io.qameta.allure.Description;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Issue;
 import io.qameta.allure.Story;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 
 @Feature(PROCESSING_STRATEGIES)
 @Story(PROACTOR)
+@RunWith(FlakinessDetectorTestRunner.class)
 public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractProcessingStrategyTestCase {
 
-  public ProactorStreamWorkQueueProcessingStrategyTestCase(Mode mode) {
-    super(mode);
+  public ProactorStreamWorkQueueProcessingStrategyTestCase() {
+    super(SOURCE);
   }
 
   @Override
@@ -481,7 +488,7 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
   }
 
   @Test
-  @Ignore("MULE-18522")
+  @FlakyTest(times = 2000)
   public void backpressureOnInnerCpuIntensiveSchedulerBusy() throws Exception {
     assumeThat(mode, is(SOURCE));
 
