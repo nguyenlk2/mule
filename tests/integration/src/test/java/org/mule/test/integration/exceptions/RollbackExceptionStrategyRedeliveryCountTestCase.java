@@ -10,7 +10,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.mule.api.config.MuleProperties.MULE_FORCE_REDELIVERY;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
@@ -36,7 +35,7 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
     }
 
     @Rule
-    public SystemProperty jRubyGlobalVar =
+    public SystemProperty muleForceRedelivery =
             new SystemProperty(MULE_FORCE_REDELIVERY, Boolean.TRUE.toString());
 
     @Test
@@ -55,7 +54,7 @@ public class RollbackExceptionStrategyRedeliveryCountTestCase extends Functional
         client.dispatch("vm://in8", "test", null);
         client.dispatch("vm://in8", "test", null);
 
-        if (!latch.await(RECEIVE_TIMEOUT, TimeUnit.MILLISECONDS))
+        if (!latch.await(100000, TimeUnit.MILLISECONDS))
         {
             fail("message should have been delivered at least 8 times");
         }
