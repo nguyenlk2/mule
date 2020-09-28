@@ -11,6 +11,7 @@ import static org.junit.Assert.fail;
 import static org.mule.api.config.MuleProperties.MULE_FORCE_REDELIVERY;
 
 import org.junit.After;
+import org.junit.Rule;
 import org.mule.api.MuleMessage;
 import org.mule.api.client.LocalMuleClient;
 import org.mule.api.context.notification.ExceptionNotificationListener;
@@ -24,21 +25,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.hamcrest.core.Is;
 import org.hamcrest.core.IsNull;
 import org.junit.Test;
+import org.mule.tck.junit4.rule.SystemProperty;
 
 public class RollbackExceptionStrategyRedeliveryCountTestCase extends FunctionalTestCase
 {
     @Override
     protected String getConfigFile()
     {
-        System.setProperty(MULE_FORCE_REDELIVERY, "true");
         return "org/mule/test/integration/exceptions/rollback-exception-strategy-redelivery-count.xml";
     }
 
-    @After
-    public void after()
-    {
-        System.setProperty(MULE_FORCE_REDELIVERY, "false");
-    }
+    @Rule
+    public SystemProperty jRubyGlobalVar =
+            new SystemProperty(MULE_FORCE_REDELIVERY, Boolean.TRUE.toString());
 
     @Test
     public void testRollbackExceptionStrategyNumberOfRetries() throws Exception
