@@ -509,11 +509,13 @@ public class ProactorStreamWorkQueueProcessingStrategyTestCase extends AbstractP
 
     try {
       // Fill the threads, the queue and an extra one to keep retrying
-      for (int i = 0; i < (2 * 2) + 1; ++i) {
+      for (int i = 0; i < (2 * 2); ++i) {
         futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
       }
 
       // Give time for the extra dispatch to get to the point where it starts retrying
+      Thread.sleep(500);
+      futures.add(asyncExecutor.submit(() -> processFlow(newEvent())));
       Thread.sleep(500);
 
       expectedException.expectCause(instanceOf(FlowBackPressureRequiredSchedulerBusyException.class));
